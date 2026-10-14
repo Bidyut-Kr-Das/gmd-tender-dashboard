@@ -44,7 +44,6 @@ const COLUMNS: Column[] = [
   { header: "Clearance Status", accessor: "clearanceStatus", defaultWidth: 150 },
   { header: "Actuator / RM Code for Actuator", accessor: "grp-3", defaultWidth: 260, children: CONTRACT_REVIEW_COLUMN_GROUPS[3].children },
   { header: "RM Code For GB", accessor: "rmCodeForGb", defaultWidth: 140 },
-  { header: "LC / RTGS", accessor: "grp-4", defaultWidth: 420, children: CONTRACT_REVIEW_COLUMN_GROUPS[4].children },
   { header: "Item Type", accessor: "itemType", defaultWidth: 110 },
   { header: "BOM Id", accessor: "bomId", defaultWidth: 100 },
   { header: "MC Received Pending", accessor: "mcReceivedPending", defaultWidth: 160 },
@@ -397,7 +396,6 @@ export default function ContractReviewPage() {
           <span style={{ fontSize: "10px", background: "rgba(255,255,255,0.12)", padding: "2px 6px", borderRadius: "10px" }}>{total} rows</span>
         </div>
         <div className="supply-sidebar-body">
-          <SidebarFilter accessor="status" label="Status" />
           <SidebarFilter accessor="clearanceStatus" label="Clearance Status" />
           <SidebarFilter accessor="item" label="Item" />
           <SidebarFilter accessor="size" label="Size" />
@@ -463,6 +461,16 @@ export default function ContractReviewPage() {
                               </label>
                               <label style={{ display: "inline-flex", alignItems: "center", gap: "3px", cursor: "pointer", color: "#16a34a", fontWeight: 700 }} title="Only rows with CBatch">
                                 <input type="checkbox" checked={filters.cBatch?.includes("(PRESENT)") ?? false} onChange={() => dispatch(toggleFilter({ column: "cBatch", value: "(PRESENT)" }))} /> C
+                              </label>
+                            </div>
+                          )}
+                          {col.accessor === "drawingUpload" && (
+                            <div style={{ display: "flex", gap: "10px", justifyContent: "center", alignItems: "center", marginTop: "4px", fontSize: "11px" }}>
+                              <label style={{ display: "inline-flex", alignItems: "center", gap: "3px", cursor: "pointer", color: "#16a34a", fontWeight: 700 }} title="Only rows with an uploaded drawing">
+                                <input type="checkbox" checked={filters.diagramUrl?.includes("(PRESENT)") ?? false} onChange={() => dispatch(toggleFilter({ column: "diagramUrl", value: "(PRESENT)" }))} /> Uploaded
+                              </label>
+                              <label style={{ display: "inline-flex", alignItems: "center", gap: "3px", cursor: "pointer", color: "#dc2626", fontWeight: 700 }} title="Only rows without an uploaded drawing">
+                                <input type="checkbox" checked={filters.diagramUrl?.includes("(Blank)") ?? false} onChange={() => dispatch(toggleFilter({ column: "diagramUrl", value: "(Blank)" }))} /> Not Uploaded
                               </label>
                             </div>
                           )}
@@ -725,7 +733,6 @@ export default function ContractReviewPage() {
                                             : CONTRACT_REVIEW_ITEM_OPTIONS;
                                         return (
                                           <div key={child.header} style={{ display: "flex", alignItems: "flex-start", marginBottom: "2px" }}>
-                                            <span style={{ color: "#8a919a", flexShrink: 0, marginRight: "4px", whiteSpace: "nowrap" }}>{child.label}</span>
                                             <select
                                               value={current}
                                               disabled={saving}
@@ -748,7 +755,6 @@ export default function ContractReviewPage() {
                                         const options = current && !actuatorOptions.includes(current) ? [current, ...actuatorOptions] : actuatorOptions;
                                         return (
                                           <div key={child.header} style={{ display: "flex", alignItems: "flex-start", marginBottom: "2px" }}>
-                                            <span style={{ color: "#8a919a", flexShrink: 0, marginRight: "4px", whiteSpace: "nowrap" }}>{child.label}</span>
                                             <select
                                               value={current}
                                               disabled={saving}
@@ -765,11 +771,8 @@ export default function ContractReviewPage() {
                                         );
                                       }
                                       return (
-                                        <div key={child.header} style={{ display: "flex", alignItems: "flex-start", marginBottom: "2px" }}>
-                                          <span style={{ color: "#8a919a", flexShrink: 0, marginRight: "4px", whiteSpace: "nowrap" }}>{child.label}</span>
-                                          <span style={{ border: "1px solid #e5e7eb", borderRadius: "4px", padding: "2px 4px", whiteSpace: "normal", wordBreak: "break-word", minWidth: 0, flex: 1, lineHeight: 1.4 }}>
-                                            {value === "-" ? <span style={{ color: "#b0b8c1" }}>-</span> : value}
-                                          </span>
+                                        <div key={child.header} style={{ whiteSpace: "normal", wordBreak: "break-word", marginBottom: "2px", lineHeight: 1.4 }}>
+                                          {value === "-" ? <span style={{ color: "#b0b8c1" }}>-</span> : value}
                                         </div>
                                       );
                                     })}

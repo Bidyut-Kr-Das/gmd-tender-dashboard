@@ -67,7 +67,8 @@ function buildWhere(
   filters: ContractReviewFilters,
   skipColumn?: string,
 ): Record<string, unknown> {
-  const fieldFilters: Record<string, unknown> = {};
+  // Only unprocessed rows: status must be null.
+  const fieldFilters: Record<string, unknown> = { status: null };
   const groups: unknown[] = [];
 
   // Presence-only filters for the hidden batch carriers. The "(PRESENT)"
@@ -79,9 +80,22 @@ function buildWhere(
     }
   }
 
+  // Drawing column: "(PRESENT)" = has a URL, "(Blank)" = none. OR-combined so
+  // selecting both (or neither) shows every row.
+  if (skipColumn !== "diagramUrl" && filters.diagramUrl?.length) {
+    const drawing: unknown[] = [];
+    if (filters.diagramUrl.includes("(PRESENT)")) {
+      drawing.push({ AND: [{ diagramUrl: { not: null } }, { diagramUrl: { not: "" } }] });
+    }
+    if (filters.diagramUrl.includes("(Blank)")) {
+      drawing.push({ OR: [{ diagramUrl: null }, { diagramUrl: "" }] });
+    }
+    if (drawing.length > 0) groups.push({ OR: drawing });
+  }
+
   for (const [col, values] of Object.entries(filters)) {
     if (!values || values.length === 0 || col === skipColumn) continue;
-    if (col === "nBatch" || col === "cBatch") continue;
+    if (col === "nBatch" || col === "cBatch" || col === "diagramUrl") continue;
     const nonBlank = values.filter((v) => v !== "(Blank)");
     const hasBlank = values.includes("(Blank)");
 

@@ -42,18 +42,6 @@ export const CONTRACT_REVIEW_COLUMN_GROUPS = [
       { header: "RM CODE FOR ACTUATOR", label: "RM Code for Actuator" },
     ],
   },
-  {
-    label: "LC / RTGS",
-    width: 420,
-    children: [
-      { header: "LC/RTGS REF NO", label: " LC/RTGSRef No -" },
-      { header: "LC DATE/RTGS DATE", label: "LC Date -" },
-      {
-        header: "LAST DATE OF SHIPMENT/DATE OF LC",
-        label: "Ship Date Of LC -",
-      },
-    ],
-  },
 ];
 
 // Distinct `item` values from the ContractReview table.
@@ -141,8 +129,5 @@ export const GROUP_HEADER_TO_ACCESSOR: Record<string, string> = {
   "PN RATING": "pnRating",
   Actuator: "actuator",
   "RM CODE FOR ACTUATOR": "rmCodeForActuator",
-  "LC/RTGS REF NO": "lcRtgsRefNo",
-  "LC DATE/RTGS DATE": "lcDateRtgsDate",
-  "LAST DATE OF SHIPMENT/DATE OF LC": "lastDateOfShipmentDateOfLc",
   "Issuing bank name": "issuingBankName",
 };
