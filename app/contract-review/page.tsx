@@ -44,7 +44,6 @@ const COLUMNS: Column[] = [
   { header: "Clearance Status", accessor: "clearanceStatus", defaultWidth: 150 },
   { header: "Actuator / RM Code for Actuator", accessor: "grp-3", defaultWidth: 260, children: CONTRACT_REVIEW_COLUMN_GROUPS[3].children },
   { header: "RM Code For GB", accessor: "rmCodeForGb", defaultWidth: 140 },
-  { header: "Item Type", accessor: "itemType", defaultWidth: 110 },
   { header: "BOM Id", accessor: "bomId", defaultWidth: 100 },
   { header: "MC Received Pending", accessor: "mcReceivedPending", defaultWidth: 160 },
   { header: "Offer Pending Done", accessor: "offerPendingDone", defaultWidth: 150 },
@@ -459,16 +458,6 @@ export default function ContractReviewPage() {
                               </span>
                             )}
                           </div>
-                          {col.accessor === "itemType" && (
-                            <div style={{ display: "flex", gap: "10px", justifyContent: "center", alignItems: "center", marginTop: "4px", fontSize: "11px" }}>
-                              <label style={{ display: "inline-flex", alignItems: "center", gap: "3px", cursor: "pointer", color: "#0ea5e9", fontWeight: 700 }} title="Only rows with NBatch">
-                                <input type="checkbox" checked={filters.nBatch?.includes("(PRESENT)") ?? false} onChange={() => dispatch(toggleFilter({ column: "nBatch", value: "(PRESENT)" }))} /> N
-                              </label>
-                              <label style={{ display: "inline-flex", alignItems: "center", gap: "3px", cursor: "pointer", color: "#16a34a", fontWeight: 700 }} title="Only rows with CBatch">
-                                <input type="checkbox" checked={filters.cBatch?.includes("(PRESENT)") ?? false} onChange={() => dispatch(toggleFilter({ column: "cBatch", value: "(PRESENT)" }))} /> C
-                              </label>
-                            </div>
-                          )}
                           {col.accessor === "drawingUpload" && (
                             <div className="custom-multiselect-container" ref={(el) => { dropdownRefs.current.diagramUrl = el; }}>
                               <button
@@ -862,22 +851,6 @@ export default function ContractReviewPage() {
                                   >
                                     {isUpdating ? <Loader2 size={12} className="animate-spin mr-1" /> : null}
                                     {current ? current : <span style={{ color: "#9ca3af" }}>— Add remarks</span>}
-                                  </div>
-                                </td>
-                              );
-                            }
-                            if (col.accessor === "itemType") {
-                              const rowRec = row as Record<string, unknown>;
-                              const itemType = rowRec.itemType == null || String(rowRec.itemType).trim() === "" ? "-" : String(rowRec.itemType);
-                              const nBatch = rowRec.nBatch == null ? "" : String(rowRec.nBatch).trim();
-                              const cBatch = rowRec.cBatch == null ? "" : String(rowRec.cBatch).trim();
-                              const chipBase: React.CSSProperties = { display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, borderRadius: "50%", fontSize: 10, fontWeight: 700, color: "#fff", flexShrink: 0, cursor: "help" };
-                              return (
-                                <td key={col.accessor} title={itemType} style={{ padding: "8px 6px", verticalAlign: "top" }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap" }}>
-                                    <span>{itemType === "-" ? <span style={{ color: "#b0b8c1" }}>-</span> : itemType}</span>
-                                    {nBatch && <span title={`NBatch: ${nBatch}`} style={{ ...chipBase, background: "#0ea5e9" }}>N</span>}
-                                    {cBatch && <span title={`CBatch: ${cBatch}`} style={{ ...chipBase, background: "#16a34a" }}>C</span>}
                                   </div>
                                 </td>
                               );
