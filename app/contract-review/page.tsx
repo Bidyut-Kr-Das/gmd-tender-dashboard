@@ -53,6 +53,11 @@ const COLUMNS: Column[] = [
   { header: "Drawing Upload", accessor: "drawingUpload", defaultWidth: 200 },
 ];
 
+const DRAWING_FILTER_OPTIONS: { label: string; value: string }[] = [
+  { label: "Uploaded", value: "(PRESENT)" },
+  { label: "Not Uploaded", value: "(Blank)" },
+];
+
 function DebouncedColumnSearch({
   accessor,
   value,
@@ -227,7 +232,7 @@ export default function ContractReviewPage() {
   }, [dispatch, page, pageSize, sort, filters, searches]);
 
   useEffect(() => {
-    if (openDropdown) {
+    if (openDropdown && openDropdown !== "diagramUrl") {
       dispatch(loadContractReviewFacet({ column: openDropdown, filters, search: searches }));
     }
   }, [dispatch, openDropdown, filters, searches]);
@@ -465,13 +470,46 @@ export default function ContractReviewPage() {
                             </div>
                           )}
                           {col.accessor === "drawingUpload" && (
-                            <div style={{ display: "flex", gap: "10px", justifyContent: "center", alignItems: "center", marginTop: "4px", fontSize: "11px" }}>
-                              <label style={{ display: "inline-flex", alignItems: "center", gap: "3px", cursor: "pointer", color: "#16a34a", fontWeight: 700 }} title="Only rows with an uploaded drawing">
-                                <input type="checkbox" checked={filters.diagramUrl?.includes("(PRESENT)") ?? false} onChange={() => dispatch(toggleFilter({ column: "diagramUrl", value: "(PRESENT)" }))} /> Uploaded
-                              </label>
-                              <label style={{ display: "inline-flex", alignItems: "center", gap: "3px", cursor: "pointer", color: "#dc2626", fontWeight: 700 }} title="Only rows without an uploaded drawing">
-                                <input type="checkbox" checked={filters.diagramUrl?.includes("(Blank)") ?? false} onChange={() => dispatch(toggleFilter({ column: "diagramUrl", value: "(Blank)" }))} /> Not Uploaded
-                              </label>
+                            <div className="custom-multiselect-container" ref={(el) => { dropdownRefs.current.diagramUrl = el; }}>
+                              <button
+                                className="multiselect-trigger-btn"
+                                onClick={() => setOpenDropdown(openDropdown === "diagramUrl" ? null : "diagramUrl")}
+                              >
+                                {(!filters.diagramUrl || filters.diagramUrl.length === 0)
+                                  ? "All Drawings"
+                                  : `${filters.diagramUrl.length} Selected`}
+                                <span className="dropdown-arrow" style={{ display: "inline-flex", alignItems: "center" }}><ChevronDown size={12} /></span>
+                              </button>
+                              {openDropdown === "diagramUrl" && (
+                                <div className="multiselect-dropdown-panel">
+                                  <div className="multiselect-actions">
+                                    <button className="multiselect-action-btn" onClick={() => dispatch(clearFilter("diagramUrl"))}>Clear All</button>
+                                    <button
+                                      className="multiselect-action-btn"
+                                      onClick={() => {
+                                        DRAWING_FILTER_OPTIONS.forEach((o) => {
+                                          const cur = filters.diagramUrl ?? [];
+                                          if (!cur.includes(o.value)) dispatch(toggleFilter({ column: "diagramUrl", value: o.value }));
+                                        });
+                                      }}
+                                    >
+                                      Select All
+                                    </button>
+                                  </div>
+                                  <div className="multiselect-options-list">
+                                    {DRAWING_FILTER_OPTIONS.map((o) => (
+                                      <label key={o.value} className="multiselect-option-label">
+                                        <input
+                                          type="checkbox"
+                                          checked={filters.diagramUrl?.includes(o.value) ?? false}
+                                          onChange={() => dispatch(toggleFilter({ column: "diagramUrl", value: o.value }))}
+                                        />
+                                        <span>{o.label}</span>
+                                      </label>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           )}
                           {col.children
